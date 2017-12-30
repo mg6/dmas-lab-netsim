@@ -58,6 +58,9 @@ void Acx_psl::handleMessage(cMessage *msg){
             simtime_t txEnd = getInterfaceDelay(psl.getFirstDestination());
             if(txEnd <= simTime()){
                 sendPacket(psl.dequeue());
+                simtime_t txEnd = getInterfaceDelay(psl.getFirstDestination());
+                Notification *notif = new Notification();
+                scheduleAt(txEnd>simTime()?txEnd:simTime(), notif);
             }else{
                 //Should NOT happen
                 EV<<"Unexpected load in outgoing channel - delaying";
@@ -80,10 +83,65 @@ void Acx_psl::handleMessage(cMessage *msg){
     }else{
         if(found != std::string::npos){
             Notification *notif = check_and_cast<Notification*>(msg);
-
+            if(notif->getQueue() == 0){
+                simtime_t txEnd = getInterfaceDelay(pw.getFirstDestination());
+                if(txEnd <= simTime()){
+                    sendPacket(pw.dequeue());
+                    simtime_t txEnd = getInterfaceDelay(pw.getFirstDestination());
+                    Notification *notif = new Notification();
+                    notif->setQueue(0);
+                    scheduleAt(txEnd>simTime()?txEnd:simTime(), notif);
+                }else{
+                    //Should NOT happen
+                    EV<<"Unexpected load in outgoing channel - delaying";
+                    Notification *notif = new Notification();
+                    notif->setQueue(0);
+                    scheduleAt(txEnd, notif);
+                }
+            }else{
+                simtime_t txEnd = getInterfaceDelay(pwr.getFirstDestination());
+                if(txEnd <= simTime()){
+                    sendPacket(pwr.dequeue());
+                    simtime_t txEnd = getInterfaceDelay(pwr.getFirstDestination());
+                    Notification *notif = new Notification();
+                    notif->setQueue(1);
+                    scheduleAt(txEnd>simTime()?txEnd:simTime(), notif);
+                }else{
+                    //Should NOT happen
+                    EV<<"Unexpected load in outgoing channel - delaying";
+                    Notification *notif = new Notification();
+                    notif->setQueue(1);
+                    scheduleAt(txEnd, notif);
+                }
+            }
         }else{
-            Packet *notif = check_and_cast<Packet*>(msg);
-
+            Packet *input = check_and_cast<Packet*>(msg);
+            bool test;
+            if(input->getDestinationAddress() < 2){
+                test=pw.enqueue(input);
+                if(test){
+                    if(pw.size() == 1){
+                        simtime_t txEnd = getInterfaceDelay(pw.getFirstDestination());
+                        Notification *notif = new Notification();
+                        notif->setQueue(0);
+                        scheduleAt(txEnd>simTime()?txEnd:simTime(), notif);
+                    }
+                }else{
+                    EV<<"Packet dropped!";
+                }
+            }else{
+                test=pwr.enqueue(input);
+                if(test){
+                    if(pwr.size() == 1){
+                        simtime_t txEnd = getInterfaceDelay(pwr.getFirstDestination());
+                        Notification *notif = new Notification();
+                        notif->setQueue(1);
+                        scheduleAt(txEnd>simTime()?txEnd:simTime(), notif);
+                    }
+                }else{
+                    EV<<"Packet dropped!";
+                }
+            }
         }
     }
 }
