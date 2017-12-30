@@ -2,7 +2,7 @@
 
 bool Queue::enqueue(Packet* pack){
     if(Queue::length++<MAX_QUEUE){
-        queueElement* qE = new queueElement(*pack); // If adding to queue breaks, look for error here
+        queueElement* qE = new queueElement(pack); // If adding to queue breaks, look for error here
         if(Queue::length == 0){
             Queue::listFirst = qE;
             Queue::listLast = qE;
@@ -18,9 +18,9 @@ bool Queue::enqueue(Packet* pack){
     }
 }
 
-Packet Queue::dequeue(){
+Packet* Queue::dequeue(){
     if(Queue::length>0){
-        Packet pack;
+        Packet* pack;
         queueElement* temporary;
         temporary = Queue::listFirst;
         Queue::listFirst = temporary->next;
@@ -42,5 +42,5 @@ int Queue::size(){
 }
 
 int Queue::getFirstDestination(){
-    return Queue::listFirst->pack.getDestinationAddress();
+    return Queue::listFirst->pack->getDestinationAddress();
 }

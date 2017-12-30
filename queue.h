@@ -7,9 +7,9 @@
 #define MAX_QUEUE 10000
 
 struct queueElement{
-    Packet pack;
+    Packet* pack;
     queueElement* next = NULL;
-    queueElement(Packet mPacket):pack(mPacket){}
+    queueElement(Packet* mPacket):pack(mPacket){}
 };
 
 class Queue{
@@ -19,7 +19,7 @@ private:
     int length = 0;
 public:
     bool enqueue(Packet* pack);
-    Packet dequeue();
+    Packet* dequeue();
     int size();
     int getFirstDestination();
 };
