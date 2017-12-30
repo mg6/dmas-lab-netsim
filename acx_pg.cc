@@ -14,5 +14,5 @@ void Acx_pg::initialize(){
 }
 
 void Acx_pg::handleMessage(cMessage *msg){
-
+    EV<<"Routing error - message on ACX_PG node";
 }
