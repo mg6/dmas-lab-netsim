@@ -1,0 +1,4 @@
+packet Packet
+{
+    int destinationAddress;
+}
