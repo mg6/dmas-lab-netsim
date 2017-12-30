@@ -36,6 +36,7 @@ simple Analyzer
 simple Acx_psl
 {
     parameters:
+        bool singleQueue;
         @display("i=device/mainframe");
     gates:
         input psl;
@@ -46,6 +47,7 @@ simple Acx_psl
 simple Acx_pw
 {
     parameters:
+        bool singleQueue;
         @display("i=device/mainframe");
     gates:
         output pw;
@@ -57,6 +59,7 @@ simple Acx_pw
 simple Acx_il
 {
     parameters:
+        bool singleQueue;
         @display("i=device/mainframe");
     gates:
         output il;
@@ -67,6 +70,7 @@ simple Acx_il
 simple Acx_pg
 {
     parameters:
+        bool singleQueue;
         @display("i=device/mainframe");
     gates:
         inout il;
@@ -76,6 +80,7 @@ simple Acx_pg
 simple Acx_pcss
 {
     parameters:
+        bool singleQueue;
         @display("i=device/mainframe");
     gates:
         output pcss;
@@ -87,6 +92,7 @@ simple Acx_pcss
 simple Acx_pwr
 {
     parameters:
+        bool singleQueue;
         @display("i=device/mainframe");
     gates:
         output pwr;

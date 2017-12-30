@@ -39,12 +39,15 @@ OBJS = \
     $O/acx_pwr.o \
     $O/analyzer.o \
     $O/generator.o \
+    $O/queue.o \
     $O/sdn.o \
     $O/sink.o \
+    $O/notification_m.o \
     $O/packet_m.o
 
 # Message files
 MSGFILES = \
+    notification.msg \
     packet.msg
 
 # SM files
