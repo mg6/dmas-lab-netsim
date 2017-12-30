@@ -3,3 +3,5 @@ lab3_dbg
 *.dll
 *.lib
 /out
+*_m.*
+.qtenvrc

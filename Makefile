@@ -30,10 +30,22 @@ PROJECTRELATIVE_PATH =
 O = $(PROJECT_OUTPUT_DIR)/$(CONFIGNAME)/$(PROJECTRELATIVE_PATH)
 
 # Object files for local .cc, .msg and .sm files
-OBJS =
+OBJS = \
+    $O/acx_il.o \
+    $O/acx_pcss.o \
+    $O/acx_pg.o \
+    $O/acx_psl.o \
+    $O/acx_pw.o \
+    $O/acx_pwr.o \
+    $O/analyzer.o \
+    $O/generator.o \
+    $O/sdn.o \
+    $O/sink.o \
+    $O/packet_m.o
 
 # Message files
-MSGFILES =
+MSGFILES = \
+    packet.msg
 
 # SM files
 SMFILES =
