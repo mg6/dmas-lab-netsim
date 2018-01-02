@@ -67,9 +67,11 @@ void Acx_pcss::handleMessage(cMessage *msg){
             simtime_t txEnd = getInterfaceDelay(pcss.getFirstDestination());
             if(txEnd <= simTime()){
                 sendPacket(pcss.dequeue());
-                simtime_t txEnd = getInterfaceDelay(pcss.getFirstDestination());
-                Notification *notif = new Notification();
-                scheduleAt(txEnd>simTime()?txEnd:simTime(), notif);
+                if(pcss.size()>0){
+                    simtime_t txEnd = getInterfaceDelay(pcss.getFirstDestination());
+                    Notification *notif = new Notification();
+                    scheduleAt(txEnd>simTime()?txEnd:simTime(), notif);
+                }
             }else{
                 //Should NOT happen
                 EV<<"Unexpected load in outgoing channel - delaying";

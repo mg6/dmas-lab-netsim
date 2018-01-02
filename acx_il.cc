@@ -67,9 +67,11 @@ void Acx_il::handleMessage(cMessage *msg){
             simtime_t txEnd = getInterfaceDelay(il.getFirstDestination());
             if(txEnd <= simTime()){
                 sendPacket(il.dequeue());
-                simtime_t txEnd = getInterfaceDelay(il.getFirstDestination());
-                Notification *notif = new Notification();
-                scheduleAt(txEnd>simTime()?txEnd:simTime(), notif);
+                if(il.size()>0){
+                    simtime_t txEnd = getInterfaceDelay(il.getFirstDestination());
+                    Notification *notif = new Notification();
+                    scheduleAt(txEnd>simTime()?txEnd:simTime(), notif);
+                }
             }else{
                 //Should NOT happen
                 EV<<"Unexpected load in outgoing channel - delaying";

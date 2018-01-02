@@ -58,9 +58,11 @@ void Acx_psl::handleMessage(cMessage *msg){
             simtime_t txEnd = getInterfaceDelay(psl.getFirstDestination());
             if(txEnd <= simTime()){
                 sendPacket(psl.dequeue());
-                simtime_t txEnd = getInterfaceDelay(psl.getFirstDestination());
-                Notification *notif = new Notification();
-                scheduleAt(txEnd>simTime()?txEnd:simTime(), notif);
+                if(psl.size()>0){
+                    simtime_t txEnd = getInterfaceDelay(psl.getFirstDestination());
+                    Notification *notif = new Notification();
+                    scheduleAt(txEnd>simTime()?txEnd:simTime(), notif);
+                }
             }else{
                 //Should NOT happen
                 EV<<"Unexpected load in outgoing channel - delaying";

@@ -68,9 +68,11 @@ void Acx_pw::handleMessage(cMessage *msg){
             simtime_t txEnd = getInterfaceDelay(pw.getFirstDestination());
             if(txEnd <= simTime()){
                 sendPacket(pw.dequeue());
-                simtime_t txEnd = getInterfaceDelay(pw.getFirstDestination());
-                Notification *notif = new Notification();
-                scheduleAt(txEnd>simTime()?txEnd:simTime(), notif);
+                if(pw.size()>0){
+                    simtime_t txEnd = getInterfaceDelay(pw.getFirstDestination());
+                    Notification *notif = new Notification();
+                    scheduleAt(txEnd>simTime()?txEnd:simTime(), notif);
+                }
             }else{
                 //Should NOT happen
                 EV<<"Unexpected load in outgoing channel - delaying";
