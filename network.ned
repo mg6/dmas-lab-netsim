@@ -19,6 +19,8 @@ simple Generator
 {
     parameters:
         @display("i=device/pc2");
+        int packetLength @unit(byte) = default(64B);
+        int sendRate @unit(gigabit/sec) = default(1Gbps);
     gates:
         output out;
 }
