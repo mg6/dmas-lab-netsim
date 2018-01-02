@@ -165,8 +165,10 @@ network net
         }
     connections:
         generator.out --> Channel --> sdn_psl.in;
+        //generator.out --> Channel --> acx_psl.psl;
         sdn_psl.out --> Channel --> analyzer.in;
         analyzer.out --> Channel --> acx_psl.psl;
+        //analyzer.out --> Channel --> sdn_psl.in;
         acx_pw.pw --> Channel --> sdn_pw.in;
         sdn_pw.out --> Channel --> sink_pw.in;
         acx_il.il --> Channel --> sdn_il.in;

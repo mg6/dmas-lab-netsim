@@ -1,16 +1,16 @@
 #include "queue.h"
 
 bool Queue::enqueue(Packet* pack){
-    if(Queue::length++<MAX_QUEUE){
+    if(length<(MAX_QUEUE+1)){
         queueElement* qE = new queueElement(pack); // If adding to queue breaks, look for error here
-        if(Queue::length == 0){
-            Queue::listFirst = qE;
-            Queue::listLast = qE;
-            Queue::length++;
+        if(length == 0){
+            listFirst = qE;
+            listLast = qE;
+            length++;
         }else{
-            Queue::listLast->next = qE;
-            Queue::listLast = qE;
-            Queue::length++;
+            listLast->next = qE;
+            listLast = qE;
+            length++;
         }
         return true;
     }else{
@@ -19,16 +19,16 @@ bool Queue::enqueue(Packet* pack){
 }
 
 Packet* Queue::dequeue(){
-    if(Queue::length>0){
+    if(length>0){
         Packet* pack;
         queueElement* temporary;
         temporary = Queue::listFirst;
-        Queue::listFirst = temporary->next;
-        Queue::length--;
+        listFirst = temporary->next;
+        length--;
         pack = temporary->pack;
         delete temporary;
-        if(Queue::length == 1){
-            Queue::listLast = NULL;
+        if(length == 1){
+            listLast = NULL;
         }
         return pack;
     }else{
@@ -38,9 +38,9 @@ Packet* Queue::dequeue(){
 }
 
 int Queue::size(){
-    return Queue::length;
+    return length;
 }
 
 int Queue::getFirstDestination(){
-    return Queue::listFirst->pack->getDestinationAddress();
+    return listFirst->pack->getDestinationAddress();
 }

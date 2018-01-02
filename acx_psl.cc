@@ -87,10 +87,12 @@ void Acx_psl::handleMessage(cMessage *msg){
                 simtime_t txEnd = getInterfaceDelay(pw.getFirstDestination());
                 if(txEnd <= simTime()){
                     sendPacket(pw.dequeue());
-                    simtime_t txEnd = getInterfaceDelay(pw.getFirstDestination());
-                    Notification *notif = new Notification();
-                    notif->setQueue(0);
-                    scheduleAt(txEnd>simTime()?txEnd:simTime(), notif);
+                    if(pw.size()>0){
+                        simtime_t txEnd = getInterfaceDelay(pw.getFirstDestination());
+                        Notification *notif = new Notification();
+                        notif->setQueue(0);
+                        scheduleAt(txEnd>simTime()?txEnd:simTime(), notif);
+                    }
                 }else{
                     //Should NOT happen
                     EV<<"Unexpected load in outgoing channel - delaying";
@@ -102,10 +104,12 @@ void Acx_psl::handleMessage(cMessage *msg){
                 simtime_t txEnd = getInterfaceDelay(pwr.getFirstDestination());
                 if(txEnd <= simTime()){
                     sendPacket(pwr.dequeue());
-                    simtime_t txEnd = getInterfaceDelay(pwr.getFirstDestination());
-                    Notification *notif = new Notification();
-                    notif->setQueue(1);
-                    scheduleAt(txEnd>simTime()?txEnd:simTime(), notif);
+                    if(pwr.size()>0){
+                        simtime_t txEnd = getInterfaceDelay(pwr.getFirstDestination());
+                        Notification *notif = new Notification();
+                        notif->setQueue(1);
+                        scheduleAt(txEnd>simTime()?txEnd:simTime(), notif);
+                    }
                 }else{
                     //Should NOT happen
                     EV<<"Unexpected load in outgoing channel - delaying";
