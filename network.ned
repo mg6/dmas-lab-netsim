@@ -164,11 +164,14 @@ network net
             @display("p=250,350");
         }
     connections:
+        // Skip SDN PSL and ANALYZER:
+//        analyzer.out --> Channel --> sdn_psl.in;
+//        generator.out --> Channel --> acx_psl.psl;
+        // Generator to SDN: 
         generator.out --> Channel --> sdn_psl.in;
-        //generator.out --> Channel --> acx_psl.psl;
         sdn_psl.out --> Channel --> analyzer.in;
+        // Analyzer to ACX
         analyzer.out --> Channel --> acx_psl.psl;
-        //analyzer.out --> Channel --> sdn_psl.in;
         acx_pw.pw --> Channel --> sdn_pw.in;
         sdn_pw.out --> Channel --> sink_pw.in;
         acx_il.il --> Channel --> sdn_il.in;
