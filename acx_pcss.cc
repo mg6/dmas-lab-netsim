@@ -62,11 +62,12 @@ void Acx_pcss::handleMessage(cMessage *msg){
     found = type.find("Notification");
     if(singleQueue){
         if(found != std::string::npos){
-            //Notification *notif = check_and_cast<Notification*>(msg);
-            check_and_cast<Notification*>(msg); // Casting just to check if proper notification was received.
+            Notification *notif = check_and_cast<Notification*>(msg);
+//            check_and_cast<Notification*>(msg); // Casting just to check if proper notification was received.
             simtime_t txEnd = getInterfaceDelay(pcss.getFirstDestination());
             if(txEnd <= simTime()){
                 sendPacket(pcss.dequeue());
+                delete(notif);
                 if(pcss.size()>0){
                     simtime_t txEnd = getInterfaceDelay(pcss.getFirstDestination());
                     Notification *notif = new Notification();
@@ -75,7 +76,7 @@ void Acx_pcss::handleMessage(cMessage *msg){
             }else{
                 //Should NOT happen
                 EV<<"Unexpected load in outgoing channel - delaying";
-                Notification *notif = new Notification();
+//                Notification *notif = new Notification();
                 scheduleAt(txEnd, notif);
             }
         }else{
@@ -88,6 +89,7 @@ void Acx_pcss::handleMessage(cMessage *msg){
                     scheduleAt(txEnd>simTime()?txEnd:simTime(), notif);
                 }
             }else{
+                delete(pack);
                 EV<<"Packet dropped!";
             }
         }
@@ -98,6 +100,7 @@ void Acx_pcss::handleMessage(cMessage *msg){
                 simtime_t txEnd = getInterfaceDelay(pcss.getFirstDestination());
                 if(txEnd <= simTime()){
                     sendPacket(pcss.dequeue());
+                    delete(notif);
                     if(pcss.size()>0){
                         simtime_t txEnd = getInterfaceDelay(pcss.getFirstDestination());
                         Notification *notif = new Notification();
@@ -107,8 +110,8 @@ void Acx_pcss::handleMessage(cMessage *msg){
                 }else{
                     //Should NOT happen
                     EV<<"Unexpected load in outgoing channel - delaying";
-                    Notification *notif = new Notification();
-                    notif->setQueue(0);
+//                    Notification *notif = new Notification();
+//                    notif->setQueue(0);
                     scheduleAt(txEnd, notif);
                 }
             }
@@ -125,9 +128,11 @@ void Acx_pcss::handleMessage(cMessage *msg){
                         scheduleAt(txEnd>simTime()?txEnd:simTime(), notif);
                     }
                 }else{
+                    delete(input);
                     EV<<"Packet dropped!";
                 }
             }else{
+                delete(input);
                 EV<<"This packet should not appear here!";
             }
         }
