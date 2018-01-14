@@ -84,7 +84,7 @@ void Analyzer::handleMessage(cMessage *msg)
                                                scheduleAt(txEnd, event2);
                            }
 
-       // isAnalyzing=false;
+    /*   // isAnalyzing=false;
         analyzeTime+=delay;
         if(!queue.IsEmpty())
         {
@@ -95,7 +95,8 @@ void Analyzer::handleMessage(cMessage *msg)
                 //char name[] = "de";
                 delayEvent->setName(name);
                 scheduleAt(simTime()+delay, delayEvent);
-        }
+
+        }*/
     }
     else
     { //receiving from sdn
