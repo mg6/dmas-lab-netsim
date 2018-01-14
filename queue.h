@@ -21,6 +21,8 @@ public:
     bool enqueue(Packet* pack);
     Packet* dequeue();
     int size();
+    bool IsFull();
+    bool IsEmpty();
     int getFirstDestination();
 };
 

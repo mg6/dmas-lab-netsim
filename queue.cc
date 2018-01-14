@@ -41,6 +41,13 @@ int Queue::size(){
     return length;
 }
 
+bool Queue::IsFull(){
+    return length>=MAX_QUEUE;
+}
+bool Queue::IsEmpty(){
+    return length==0;
+}
+
 int Queue::getFirstDestination(){
     return listFirst->pack->getDestinationAddress();
 }
