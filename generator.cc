@@ -6,12 +6,13 @@ using namespace omnetpp;
 class Generator : public cSimpleModule {
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
+    virtual void refreshDisplay() const override;
 
     int packetLength;
     int destination;
     simtime_t secondsPerPacket;
 
-    int numPacketsEmitted;
+    unsigned long numPacketsEmitted;
 };
 
 Define_Module(Generator);
@@ -31,7 +32,7 @@ void Generator::handleMessage(cMessage *msg){
     pkt->setDestinationAddress(destination);
     pkt->setByteLength((int64_t)packetLength);
     char name[] = "Packet             ";
-    snprintf(&name[7], sizeof(name)/sizeof(char) - 7, "%d", numPacketsEmitted);
+    snprintf(&name[7], sizeof(name)/sizeof(char) - 7, "%lu", numPacketsEmitted);
     pkt->setName(name);
 
     cChannel *outChannel = gate("out")->getTransmissionChannel();
@@ -56,4 +57,10 @@ void Generator::handleMessage(cMessage *msg){
         delete pkt;
         scheduleAt(finishTime, msg);
     }
+}
+
+void Generator::refreshDisplay() const {
+    char buf[40];
+    sprintf(buf, "emit: %lu", numPacketsEmitted);
+    getDisplayString().setTagArg("t", 0, buf);
 }

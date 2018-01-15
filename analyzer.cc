@@ -9,13 +9,15 @@ using namespace omnetpp;
 class Analyzer : public cSimpleModule {
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
+    virtual void refreshDisplay() const override;
     void StartPackedAnalyze(cMessage *msg);
     void SendAnalyzedMessageFurther(cMessage *msg);
     void DisplayPackagesData();
     float analyzeTime;
-    int droppedMessages=0;
-    int analyzedMessages=0;
-    int startedAnalyzeMessages=0;
+    unsigned long receivedMessages = 0;
+    unsigned long droppedMessages=0;
+    unsigned long analyzedMessages=0;
+    unsigned long startedAnalyzeMessages=0;
     Queue queue;
     char analyze[2]="a";
 
@@ -32,6 +34,7 @@ EV_INFO << "t: " << analyzeTime<< endl;
 
 void Analyzer::handleMessage(cMessage *msg)
 {
+    ++receivedMessages;
    if(strncmp(msg->getName(), analyze, 10 )==0)    //if(msg->isSelfMessage())
     {
        SendAnalyzedMessageFurther(msg);
@@ -76,4 +79,10 @@ void Analyzer::DisplayPackagesData()
         EV_INFO << "dropped: " <<droppedMessages<< endl;
         EV_INFO << "analyzed: " <<analyzedMessages<< endl;
         EV_INFO << "AnalyzeMessages: " <<startedAnalyzeMessages<< endl;
+}
+
+void Analyzer::refreshDisplay() const {
+    char buf[40];
+    sprintf(buf, "rcvd: %lu drpd: %lu", receivedMessages, droppedMessages);
+    getDisplayString().setTagArg("t", 0, buf);
 }
