@@ -31,7 +31,7 @@ void Generator::handleMessage(cMessage *msg){
     pkt->setDestinationAddress(destination);
     pkt->setByteLength((int64_t)packetLength);
     char name[] = "Packet             ";
-    itoa(numPacketsEmitted, name + 7, 10);
+    snprintf(&name[7], sizeof(name)/sizeof(char) - 7, "%d", numPacketsEmitted);
     pkt->setName(name);
 
     cChannel *outChannel = gate("out")->getTransmissionChannel();
