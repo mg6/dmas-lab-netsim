@@ -29,6 +29,7 @@ simple Analyzer
 {
     parameters:
         @display("i=device/server");
+        int analyzeTime @unit(us) = default(1us);
     gates:
         input in;
         output out;
