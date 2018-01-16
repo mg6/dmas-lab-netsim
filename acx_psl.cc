@@ -17,10 +17,16 @@ private:
     Queue pw;
     simtime_t getInterfaceDelay(int destination);
     void sendPacket(Packet *data);
+
+    unsigned long numPacketsDropped;
+    unsigned long numPacketsReceived;
+
     GlobalStatsListener* globalStats;
+
 protected:
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
+    virtual void refreshDisplay() const override;
 };
 
 Define_Module(Acx_psl);
@@ -48,11 +54,14 @@ void Acx_psl::sendPacket(Packet *data){
 void Acx_psl::initialize(){
     singleQueue = par("singleQueue");
 
+    numPacketsDropped = 0;
+    numPacketsReceived = 0;
+
     cModule * mod = getModuleByPath("total_stats");
     if (mod) {
         globalStats = dynamic_cast<GlobalStatsListener*>(mod);
     } else {
-        error("No global_stats module.");
+        error("No total_stats module.");
     }
 }
 
@@ -80,6 +89,7 @@ void Acx_psl::handleMessage(cMessage *msg){
                 scheduleAt(txEnd, notif);
             }
         }else{
+            ++numPacketsReceived;
             Packet *pack = check_and_cast<Packet*>(msg);
             bool test = psl.enqueue(pack);
             if(test){
@@ -91,6 +101,7 @@ void Acx_psl::handleMessage(cMessage *msg){
             }else{
                 delete(pack);
                 EV<<"Packet dropped!";
+                ++numPacketsDropped;
                 ++globalStats->getNumTotalDropped();
             }
         }
@@ -135,6 +146,7 @@ void Acx_psl::handleMessage(cMessage *msg){
                 }
             }
         }else{
+            ++numPacketsReceived;
             Packet *input = check_and_cast<Packet*>(msg);
             bool test;
             if(input->getDestinationAddress() < 2){
@@ -149,6 +161,7 @@ void Acx_psl::handleMessage(cMessage *msg){
                 }else{
                     delete(input);
                     EV<<"Packet dropped!";
+                    ++numPacketsDropped;
                     ++globalStats->getNumTotalDropped();
                 }
             }else{
@@ -163,9 +176,16 @@ void Acx_psl::handleMessage(cMessage *msg){
                 }else{
                     delete(input);
                     EV<<"Packet dropped!";
+                    ++numPacketsDropped;
                     ++globalStats->getNumTotalDropped();
                 }
             }
         }
     }
+}
+
+void Acx_psl::refreshDisplay() const {
+    char buf[40];
+    sprintf(buf, "rcvd: %lu drpd: %lu", numPacketsReceived, numPacketsDropped);
+    getDisplayString().setTagArg("t", 0, buf);
 }

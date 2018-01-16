@@ -17,10 +17,16 @@ private:
     Queue pcss;
     simtime_t getInterfaceDelay(int destination);
     void sendPacket(Packet *data);
+
+    unsigned long numPacketsDropped;
+    unsigned long numPacketsReceived;
+
     GlobalStatsListener* globalStats;
+
 protected:
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
+    virtual void refreshDisplay() const override;
 };
 
 Define_Module(Acx_pw);
@@ -57,11 +63,14 @@ void Acx_pw::sendPacket(Packet *data){
 void Acx_pw::initialize(){
     singleQueue = par("singleQueue");
 
+    numPacketsDropped = 0;
+    numPacketsReceived = 0;
+
     cModule * mod = getModuleByPath("total_stats");
     if (mod) {
         globalStats = dynamic_cast<GlobalStatsListener*>(mod);
     } else {
-        error("No global_stats module.");
+        error("No total_stats module.");
     }
 }
 
@@ -90,6 +99,7 @@ void Acx_pw::handleMessage(cMessage *msg){
                 scheduleAt(txEnd, notif);
             }
         }else{
+            ++numPacketsReceived;
             Packet *pack = check_and_cast<Packet*>(msg);
             bool test = pw.enqueue(pack);
             if(test){
@@ -101,6 +111,7 @@ void Acx_pw::handleMessage(cMessage *msg){
             }else{
                 delete(pack);
                 EV<<"Packet dropped!";
+                ++numPacketsDropped;
                 ++globalStats->getNumTotalDropped();
             }
         }
@@ -145,6 +156,7 @@ void Acx_pw::handleMessage(cMessage *msg){
                 }
             }
         }else{
+            ++numPacketsReceived;
             Packet *input = check_and_cast<Packet*>(msg);
             bool test;
             if(input->getDestinationAddress() == 0){
@@ -159,6 +171,7 @@ void Acx_pw::handleMessage(cMessage *msg){
                 }else{
                     delete(input);
                     EV<<"Packet dropped!";
+                    ++numPacketsDropped;
                     ++globalStats->getNumTotalDropped();
                 }
             }else{
@@ -174,14 +187,22 @@ void Acx_pw::handleMessage(cMessage *msg){
                     }else{
                         delete(input);
                         EV<<"Packet dropped!";
+                        ++numPacketsDropped;
                         ++globalStats->getNumTotalDropped();
                     }
                 }else{
                     delete(input);
                     EV<<"This packet should not appear here!";
+                    ++numPacketsDropped;
                     ++globalStats->getNumTotalDropped();
                 }
             }
         }
     }
+}
+
+void Acx_pw::refreshDisplay() const {
+    char buf[40];
+    sprintf(buf, "rcvd: %lu drpd: %lu", numPacketsReceived, numPacketsDropped);
+    getDisplayString().setTagArg("t", 0, buf);
 }
