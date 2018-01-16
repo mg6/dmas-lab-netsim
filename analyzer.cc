@@ -8,6 +8,7 @@ using namespace omnetpp;
 #define usInS 1000000
 class Analyzer : public cSimpleModule {
     virtual void initialize() override;
+    virtual ~Analyzer();
     virtual void handleMessage(cMessage *msg) override;
     virtual void refreshDisplay() const override;
     void StartPackedAnalyze(cMessage *msg);
@@ -29,6 +30,12 @@ void Analyzer::initialize(){
     int usTime=par("analyzeTime");
 analyzeTime=(float)usTime/usInS;
 EV_INFO << "t: " << analyzeTime<< endl;
+}
+
+Analyzer::~Analyzer() {
+    Packet* p;
+    while ((p = queue.dequeue()) != NULL)
+        delete p;
 }
 
 
@@ -53,6 +60,7 @@ void Analyzer::handleMessage(cMessage *msg)
                {
                    droppedMessages++;
                    EV_INFO << "dropped packed" << endl;
+                   delete msg;
                }
     }
 
@@ -69,7 +77,7 @@ void Analyzer::StartPackedAnalyze(cMessage *msg)
 void Analyzer::SendAnalyzedMessageFurther(cMessage *msg)
 {
         analyzedMessages++;
-       cancelEvent(msg);
+       delete msg;
        send(queue.dequeue(), "out");
        EV_INFO << "ended analyze " << endl;
 }

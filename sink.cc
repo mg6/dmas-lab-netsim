@@ -19,6 +19,7 @@ void Sink::initialize(){
 
 void Sink::handleMessage(cMessage *msg){
     ++numReceived;
+    delete msg;
 }
 
 void Sink::refreshDisplay() const {

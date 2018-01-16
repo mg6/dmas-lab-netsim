@@ -11,7 +11,6 @@ class Sdn : public cSimpleModule {
 Define_Module(Sdn);
 
 void Sdn::initialize(){
-    cMessage *selfMessage = new cMessage();
 }
 
 void Sdn::handleMessage(cMessage *msg){
