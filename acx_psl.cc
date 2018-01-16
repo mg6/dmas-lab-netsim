@@ -48,7 +48,7 @@ void Acx_psl::sendPacket(Packet *data){
 void Acx_psl::initialize(){
     singleQueue = par("singleQueue");
 
-    cModule * mod = getModuleByPath("global_stats");
+    cModule * mod = getModuleByPath("total_stats");
     if (mod) {
         globalStats = dynamic_cast<GlobalStatsListener*>(mod);
     } else {

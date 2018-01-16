@@ -18,7 +18,7 @@ Define_Module(Sink);
 void Sink::initialize(){
     numReceived = 0;
 
-    cModule * mod = getModuleByPath("global_stats");
+    cModule * mod = getModuleByPath("total_stats");
     if (mod) {
         globalStats = dynamic_cast<GlobalStatsListener*>(mod);
     } else {

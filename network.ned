@@ -166,7 +166,7 @@ network net
         acx_pwr: Acx_pwr {
             @display("p=250,350");
         }
-        global_stats: GlobalStatsListener {
+        total_stats: GlobalStatsListener {
             @display("p=50,50");
         }
     connections:
