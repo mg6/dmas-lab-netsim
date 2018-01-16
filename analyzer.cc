@@ -3,6 +3,7 @@
 #include <string>
 #include "notification_m.h"
 #include "packet_m.h"
+#include "global_stats_listener.h"
 
 using namespace omnetpp;
 #define usInS 1000000
@@ -27,6 +28,7 @@ class Analyzer : public cSimpleModule {
     simtime_t getInterfaceDelay();
     bool isSendingMessages = false;
     char selfString[2] = "s";
+    GlobalStatsListener* globalStats;
 };
 
 Define_Module(Analyzer);
@@ -35,6 +37,13 @@ void Analyzer::initialize() {
     int usTime = par("analyzeTime");
     analyzeTime = (float)usTime / usInS;
     EV_INFO << "t: " << analyzeTime << endl;
+
+    cModule * mod = getModuleByPath("global_stats");
+    if (mod) {
+        globalStats = dynamic_cast<GlobalStatsListener*>(mod);
+    } else {
+        error("No global_stats module.");
+    }
 }
 
 Analyzer::~Analyzer() {
@@ -74,7 +83,8 @@ void Analyzer::handleMessage(cMessage *msg)
         }
         else
         {
-            droppedMessages++;
+            ++droppedMessages;
+            ++globalStats->getNumTotalDropped();
             EV_INFO << "dropped packed" << endl;
             delete msg;
         }
