@@ -39,6 +39,7 @@ OBJS = \
     $O/acx_pwr.o \
     $O/analyzer.o \
     $O/generator.o \
+    $O/global_stats_listener.o \
     $O/queue.o \
     $O/sdn.o \
     $O/sink.o \
