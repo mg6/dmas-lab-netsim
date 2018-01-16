@@ -1,5 +1,6 @@
 #include <omnetpp.h>
 #include "packet_m.h"
+#include "global_stats_listener.h"
 
 using namespace omnetpp;
 
@@ -12,7 +13,10 @@ class Generator : public cSimpleModule {
     int destination;
     simtime_t secondsPerPacket;
 
+    unsigned long numPacketsDropped;
     unsigned long numPacketsEmitted;
+
+    GlobalStatsListener* globalStats;
 };
 
 Define_Module(Generator);
@@ -22,9 +26,17 @@ void Generator::initialize(){
     long sendRate = par("sendRate");
     secondsPerPacket = packetLength * (8.f / (float)sendRate);
     destination = 0;
+    numPacketsDropped = 0;
     numPacketsEmitted = 0;
     cMessage *selfMessage = new cMessage();
     scheduleAt(simTime(), selfMessage);
+
+    cModule * mod = getModuleByPath("total_stats");
+    if (mod) {
+        globalStats = dynamic_cast<GlobalStatsListener*>(mod);
+    } else {
+        error("No global_stats module.");
+    }
 }
 
 void Generator::handleMessage(cMessage *msg){
@@ -55,12 +67,14 @@ void Generator::handleMessage(cMessage *msg){
     else
     {
         delete pkt;
+        ++numPacketsDropped;
+        ++globalStats->getNumTotalDropped();
         scheduleAt(finishTime, msg);
     }
 }
 
 void Generator::refreshDisplay() const {
     char buf[40];
-    sprintf(buf, "emit: %lu", numPacketsEmitted);
+    sprintf(buf, "emit: %lu drpd: %lu", numPacketsEmitted, numPacketsDropped);
     getDisplayString().setTagArg("t", 0, buf);
 }
