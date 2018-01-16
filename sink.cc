@@ -1,4 +1,5 @@
 #include <omnetpp.h>
+#include "global_stats_listener.h"
 
 using namespace omnetpp;
 
@@ -8,6 +9,7 @@ class Sink : public cSimpleModule {
     virtual void refreshDisplay() const override;
 
 private:
+    GlobalStatsListener* globalStats;
     unsigned long numReceived;
 };
 
@@ -15,10 +17,19 @@ Define_Module(Sink);
 
 void Sink::initialize(){
     numReceived = 0;
+
+    cModule * mod = getModuleByPath("global_stats");
+    if (mod) {
+        globalStats = dynamic_cast<GlobalStatsListener*>(mod);
+    } else {
+        error("No global_stats module.");
+    }
 }
 
 void Sink::handleMessage(cMessage *msg){
     ++numReceived;
+    ++globalStats->getNumTotalDelivered();
+
     delete msg;
 }
 
