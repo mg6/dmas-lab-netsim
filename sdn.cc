@@ -6,6 +6,7 @@ class Sdn : public cSimpleModule {
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
     void TryToSendMessage();
+    virtual ~Sdn();
     Queue queue;
     simtime_t getInterfaceDelay();
     bool isSendingMessages=false;
@@ -15,6 +16,12 @@ class Sdn : public cSimpleModule {
 Define_Module(Sdn);
 
 void Sdn::initialize(){
+}
+
+Sdn::~Sdn() {
+    Packet* p;
+    while ((p = queue.dequeue()) != NULL)
+        delete p;
 }
 
 void Sdn::handleMessage(cMessage *msg){

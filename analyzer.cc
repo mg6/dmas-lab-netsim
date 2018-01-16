@@ -22,13 +22,11 @@ class Analyzer : public cSimpleModule {
     unsigned long startedAnalyzeMessages = 0;
     Queue queue;
     char analyze[2] = "a";
-
     Queue queueOut;
     void TryToSendMessage();
     simtime_t getInterfaceDelay();
     bool isSendingMessages = false;
     char selfString[2] = "s";
-
 };
 
 Define_Module(Analyzer);
@@ -43,27 +41,26 @@ Analyzer::~Analyzer() {
     Packet* p;
     while ((p = queue.dequeue()) != NULL)
         delete p;
+    while ((p = queueOut.dequeue()) != NULL)
+           delete p;
 }
 
 
 void Analyzer::handleMessage(cMessage *msg)
 {
-    ++receivedMessages;
-    EV_INFO << "0" << endl;
     if (strncmp(msg->getName(), analyze, 10) == 0)    //if(msg->isSelfMessage())
     {
-        EV_INFO << "1" << endl;
         delete msg;
         EndAnalyze();
     }
     else if (strncmp(msg->getName(), selfString, 10) == 0)
     {
-        EV_INFO << "2 " << endl;
         delete(msg);
         TryToSendMessage();
     }
     else
     { //receiving from sdn
+        ++receivedMessages;
         DisplayPackagesData();
         EV_INFO << "1" << endl;
         if (!queue.IsFull())
@@ -82,64 +79,48 @@ void Analyzer::handleMessage(cMessage *msg)
             delete msg;
         }
     }
-    EV_INFO << "099" << endl;
 }
 
 void Analyzer::StartPackedAnalyze()
 {
-    EV_INFO << "4.6" << endl;
     isAnalyzing = true;
     EV_INFO << "Started packed analyze" << endl;
     startedAnalyzeMessages++;
     cMessage *delayEvent = new cMessage("delayEvent");
     delayEvent->setName(analyze);
-    EV_INFO << "4.7" << endl;
     scheduleAt(simTime() + analyzeTime, delayEvent);
-    EV_INFO << "4.8" << endl;
 }
 void Analyzer::EndAnalyze()
 {
     analyzedMessages++;
-    //send(queue.dequeue(), "out");
-    EV_INFO << "3" << endl;
-
-
 
     if (!isSendingMessages && !queueOut.IsFull())
     {
-        EV_INFO << "4" << endl;
         isSendingMessages = true;
         queueOut.enqueue(queue.dequeue());
         TryToSendMessage();
-        EV_INFO << "10" << endl;
     }
 
     EV_INFO << "ended analyze " << endl;
     if (!queue.IsEmpty())
     {
-        EV_INFO << "4.5" << endl;
         StartPackedAnalyze();
     }
     else
         isAnalyzing = false;
-    //move it to the moment package is pushed forward as it is guarantee we can start another analyze
-
-
 }
 
 void Analyzer::TryToSendMessage() {
+
     simtime_t txEnd = getInterfaceDelay();
     if (txEnd <= simTime()) {
-        EV_INFO << "5" << endl;
-        send(queueOut.dequeue(), "out");
-        EV_INFO << "6" << endl;
+        Packet *pack = check_and_cast<Packet*>(queueOut.dequeue());
+        send(pack, "out");
         if (!queueOut.IsEmpty()) {
-            EV_INFO << "7" << endl;
             simtime_t txEnd = getInterfaceDelay();
             cMessage *self = new cMessage("self");
             self->setName(selfString);
             scheduleAt(txEnd > simTime() ? txEnd : simTime(), self);
-            EV_INFO << "8" << endl;
 
         }
         else {
@@ -148,7 +129,6 @@ void Analyzer::TryToSendMessage() {
     }
     else
     {
-        EV_INFO << "9" << endl;
         TryToSendMessage();
     }
 }
