@@ -3,6 +3,7 @@
 #include <string>
 #include "notification_m.h"
 #include "packet_m.h"
+#include "global_stats_listener.h"
 
 using namespace omnetpp;
 
@@ -15,6 +16,7 @@ private:
     Queue pcss;
     simtime_t getInterfaceDelay(int destination);
     void sendPacket(Packet *data);
+    GlobalStatsListener* globalStats;
 protected:
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
@@ -44,6 +46,13 @@ void Acx_pwr::sendPacket(Packet *data){
 
 void Acx_pwr::initialize(){
     singleQueue = par("singleQueue");
+
+    cModule * mod = getModuleByPath("global_stats");
+    if (mod) {
+        globalStats = dynamic_cast<GlobalStatsListener*>(mod);
+    } else {
+        error("No global_stats module.");
+    }
 }
 
 void Acx_pwr::handleMessage(cMessage *msg){
@@ -81,6 +90,7 @@ void Acx_pwr::handleMessage(cMessage *msg){
             }else{
                 delete(pack);
                 EV<<"Packet dropped!";
+                ++globalStats->getNumTotalDropped();
             }
         }
     }else{
@@ -138,6 +148,7 @@ void Acx_pwr::handleMessage(cMessage *msg){
                 }else{
                     delete(input);
                     EV<<"Packet dropped!";
+                    ++globalStats->getNumTotalDropped();
                 }
             }else{
                 if(input->getDestinationAddress() == 3){
@@ -152,10 +163,12 @@ void Acx_pwr::handleMessage(cMessage *msg){
                     }else{
                         delete(input);
                         EV<<"Packet dropped!";
+                        ++globalStats->getNumTotalDropped();
                     }
                 }else{
                     delete(input);
                     EV<<"This packet should not appear here!";
+                    ++globalStats->getNumTotalDropped();
                 }
             }
         }
